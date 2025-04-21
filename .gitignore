@@ -1,0 +1,35 @@
+# Build results
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Rider
+.idea/
+
+# Workspace
+*.code-workspace
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+*.tmp
+
+# NuGet
+*.nupkg
+packages/
+*.snupkg
+
+# DLLs
+*.dll
+
+# OS-specific
+.DS_Store
+Thumbs.db
