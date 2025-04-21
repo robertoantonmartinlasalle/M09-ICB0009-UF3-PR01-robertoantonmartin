@@ -12,8 +12,7 @@ obj/
 # Rider
 .idea/
 
-# Workspace
-*.code-workspace
+
 
 # Logs
 *.log
