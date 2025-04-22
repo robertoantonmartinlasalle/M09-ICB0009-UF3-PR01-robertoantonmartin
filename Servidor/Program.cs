@@ -16,7 +16,7 @@ namespace Servidor
 
         static void Main(string[] args)
         {
-            // En esta primera etapa inicializo el servidor para escuchar en el puerto 13000.
+            // En esta etapa, modifico el servidor para aceptar múltiples clientes al mismo tiempo.
             int puerto = 13000;
 
             // TcpListener escucha conexiones entrantes en cualquier dirección IP local.
@@ -25,17 +25,26 @@ namespace Servidor
 
             Console.WriteLine("Servidor iniciado. Esperando conexiones de clientes...");
 
-            // El servidor se queda bloqueado esperando que se conecte un cliente.
-            TcpClient clienteConectado = servidor.AcceptTcpClient();
-            Console.WriteLine("Cliente conectado correctamente.");
+            // Con este bucle, dejo el servidor siempre escuchando y aceptando nuevos clientes.
+            while (true)
+            {
+                // Acepto la conexión del cliente.
+                TcpClient clienteConectado = servidor.AcceptTcpClient();
+                Console.WriteLine("Cliente conectado.");
 
-            // Mantengo la consola abierta para observar que todo funciona.
-            Console.WriteLine("Pulsa ENTER para cerrar el servidor.");
-            Console.ReadLine();
+                // Por cada cliente conectado, creo un nuevo hilo que lo atienda de forma independiente.
+                Thread hiloCliente = new Thread(() => GestionarCliente(clienteConectado));
+                hiloCliente.Start();
+            }
+        }
 
-            // Cierro conexiones y detengo el servidor.
-            clienteConectado.Close();
-            servidor.Stop();
+        // Este método será ejecutado por cada hilo individual.
+        // En esta etapa simplemente muestro un mensaje de que el cliente está siendo atendido,
+        // y cierro la conexión porque todavía no intercambiamos datos.
+        static void GestionarCliente(TcpClient cliente)
+        {
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Cliente atendido.");
+            cliente.Close();
         }
 
     }

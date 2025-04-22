@@ -66,6 +66,44 @@ Durante esta etapa he validado que el cliente y el servidor pueden comunicarse c
 
 ---
 
+##  Etapa 2 - Conexión múltiple: varios clientes concurrentes
+
+###  Objetivo
+
+Ampliar el servidor para que pueda aceptar **múltiples clientes simultáneamente**, gestionando cada conexión en un **hilo independiente**. De esta forma, el servidor no se bloquea al atender a un único cliente, sino que puede seguir aceptando nuevas conexiones mientras atiende las anteriores.
+
+---
+
+###  Explicación técnica
+
+- He modificado el servidor para que ejecute un **bucle infinito `while (true)`** que acepta conexiones indefinidamente.
+- Cada vez que un cliente se conecta, se lanza un nuevo **`Thread`** que gestiona esa conexión.
+- Para cada cliente, se muestra un mensaje con el **ID del hilo** que lo atiende, lo que permite verificar que efectivamente se están creando múltiples hilos concurrentes.
+- El servidor se mantiene activo todo el tiempo, esperando nuevos clientes sin cerrarse tras el primero.
+
+---
+
+###  Resultado de la prueba
+
+- Se ha ejecutado el servidor y luego se han abierto varias instancias del cliente en paralelo.
+- Todos los clientes han sido aceptados correctamente sin bloquear al servidor.
+- En consola se observa que por cada cliente se imprime el mensaje de conexión y el hilo correspondiente lo atiende.
+
+---
+
+###  Captura de pantalla
+
+![Conexión múltiples clientes - Etapa 2](./img/etapa2-multicliente.png)
+
+---
+
+###  Comentario personal
+
+Durante esta etapa he aprendido a gestionar conexiones concurrentes mediante el uso de hilos (`Thread`). Al principio me llamó la atención que el orden de los `Thread ID` no siempre coincide con el orden de conexión, pero entendí que esto se debe a cómo .NET administra internamente los recursos de sistema.  
+Este cambio sienta la base para permitir que múltiples vehículos circulen simultáneamente, lo cual será fundamental en las siguientes etapas.
+
+
+
 ##  Alumno
 
 - **Nombre completo:** Roberto Antón Martín  
