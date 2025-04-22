@@ -143,6 +143,43 @@ Esta etapa ha sido clave para comenzar a dar identidad a cada cliente conectado.
 
 ---
 
+## Etapa 4 - Obtención del NetworkStream
+
+### Objetivo
+
+Obtener el objeto `NetworkStream` para cada cliente que se conecta al servidor. Este stream permitirá más adelante el envío y la recepción de datos de forma estructurada entre cliente y servidor.
+
+---
+
+### Explicación técnica
+
+- Al recibir una conexión, he obtenido el `NetworkStream` directamente a partir del `TcpClient` utilizando `GetStream()`.
+- Se muestra un mensaje en consola indicando que el `NetworkStream` ha sido obtenido correctamente.
+- En esta etapa todavía no se realiza ningún envío o recepción de datos. Solo se prepara el canal de comunicación para las siguientes fases del proyecto.
+
+---
+
+### Resultado de la prueba
+
+- El servidor acepta múltiples conexiones como en la etapa anterior.
+- Por cada cliente conectado, se muestra en consola:
+  - Su ID y dirección asignada.
+  - Un mensaje adicional indicando que el `NetworkStream` se ha obtenido correctamente.
+- Se ha verificado que no se produce ningún error al obtener el stream y que este se asigna correctamente a cada hilo.
+
+---
+
+### Captura de pantalla
+
+![Obtención del NetworkStream - Etapa 4](./img/etapa4-networkstream.png)
+
+---
+
+### Comentario personal
+
+Esta etapa me ha servido para preparar la base de la comunicación bidireccional entre el cliente y el servidor. Aunque todavía no se intercambian datos, el hecho de obtener el `NetworkStream` correctamente me ha hecho entender cómo funciona este canal y cómo será utilizado en las etapas siguientes para leer y escribir mensajes entre ambas partes. También me ha permitido asegurar que cada hilo tiene su propio stream, lo que facilitará una gestión ordenada de cada cliente.
+
+
 ##  Alumno
 
 - **Nombre completo:** Roberto Antón Martín  

@@ -62,6 +62,10 @@ namespace Servidor
 
             Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Vehículo conectado. ID asignado: {idAsignado} - Dirección: {direccion}");
 
+            // Etapa 4: obtención del NetworkStream
+            NetworkStream stream = cliente.GetStream();
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] NetworkStream obtenido correctamente.");
+
             cliente.Close();
         }
     }
