@@ -56,7 +56,7 @@ Establecer una conexión básica entre un cliente (vehículo) y el servidor. El 
 
 ###  Captura de pantalla
 
-![Captura conexión cliente-servidor](./imagenes/etapa1-cliente-servidor.png)
+![Captura conexión cliente-servidor](./img/etapa1-cliente-servidor.png)
 
 ---
 
