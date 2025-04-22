@@ -10,9 +10,13 @@ using VehiculoClass;
 
 namespace Servidor
 {
-
     class Program
     {
+        // Contador global de IDs que se autoincrementará para cada cliente.
+        static int contadorId = 1;
+
+        // Objeto de bloqueo para asegurar que solo un hilo a la vez modifica el ID.
+        static readonly object lockId = new object();
 
         static void Main(string[] args)
         {
@@ -39,14 +43,26 @@ namespace Servidor
         }
 
         // Este método será ejecutado por cada hilo individual.
-        // En esta etapa simplemente muestro un mensaje de que el cliente está siendo atendido,
-        // y cierro la conexión porque todavía no intercambiamos datos.
+        // Ahora asigno un ID único y una dirección aleatoria al cliente.
         static void GestionarCliente(TcpClient cliente)
         {
-            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Cliente atendido.");
+            int idAsignado;
+            string direccion;
+
+            // Bloqueo para que los hilos no se pisen al asignar ID.
+            lock (lockId)
+            {
+                idAsignado = contadorId;
+                contadorId++;
+            }
+
+            // Genero dirección aleatoria para el vehículo (Norte o Sur).
+            Random rnd = new Random();
+            direccion = rnd.Next(2) == 0 ? "Norte" : "Sur";
+
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Vehículo conectado. ID asignado: {idAsignado} - Dirección: {direccion}");
+
             cliente.Close();
         }
-
     }
 }
-

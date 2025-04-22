@@ -102,7 +102,46 @@ Ampliar el servidor para que pueda aceptar **múltiples clientes simultáneament
 Durante esta etapa he aprendido a gestionar conexiones concurrentes mediante el uso de hilos (`Thread`). Al principio me llamó la atención que el orden de los `Thread ID` no siempre coincide con el orden de conexión, pero entendí que esto se debe a cómo .NET administra internamente los recursos de sistema.  
 Este cambio sienta la base para permitir que múltiples vehículos circulen simultáneamente, lo cual será fundamental en las siguientes etapas.
 
+---
 
+## Etapa 3 - Asignación de ID único y dirección aleatoria
+
+### Objetivo
+
+Asignar un identificador único (ID) y una dirección aleatoria ("Norte" o "Sur") a cada cliente que se conecta al servidor. Este ID y dirección servirán como atributos básicos del vehículo en las próximas etapas.
+
+---
+
+### Explicación técnica
+
+- He añadido un contador global estático (`contadorId`) en el servidor, que incrementa su valor con cada cliente nuevo.
+- Utilizo un `lock` para asegurar que el acceso concurrente a este contador desde varios hilos sea seguro.
+- Además, se genera aleatoriamente la dirección del vehículo, que puede ser `"Norte"` o `"Sur"`.
+- Estos datos se muestran por consola para confirmar que cada cliente recibe su propio ID y dirección al conectarse.
+
+---
+
+### Resultado de la prueba
+
+- Al iniciar el servidor y conectar varios clientes, se observa que:
+  - Cada cliente recibe un ID único (1, 2, 3…).
+  - Cada cliente recibe una dirección asignada de forma aleatoria.
+  - Los mensajes aparecen correctamente identificados por hilo en la consola del servidor.
+- Se ha verificado que, incluso al cerrar clientes tras la conexión, el servidor sigue asignando nuevos IDs correctamente a los siguientes.
+
+---
+
+### Captura de pantalla
+
+![Asignación ID y dirección - Etapa 3](./img/etapa3-id-direccion.png)
+
+---
+
+### Comentario personal
+
+Esta etapa ha sido clave para comenzar a dar identidad a cada cliente conectado. El uso de `lock` para evitar condiciones de carrera al asignar el ID me ha permitido entender cómo se gestionan los recursos compartidos entre hilos. También he comprendido que el orden de llegada no tiene por qué coincidir con el número de hilo ni el ID final, lo que es lógico considerando el modelo de ejecución de hilos en .NET.
+
+---
 
 ##  Alumno
 
