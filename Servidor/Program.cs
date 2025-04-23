@@ -120,6 +120,14 @@ namespace Servidor
             Console.WriteLine($"  Acabado: {vehiculoRecibido.Acabado}");
             Console.WriteLine($"  Parado: {vehiculoRecibido.Parado}");
 
+            // Etapa 2 (Ejercicio 2): Creo el objeto Carretera y añado el vehículo recibido
+            Carretera carretera = new Carretera();
+            carretera.AñadirVehiculo(vehiculoRecibido);
+
+            // Envío el objeto Carretera al cliente usando la clase NetworkStreamClass
+            NetworkStreamClass.EscribirDatosCarreteraNS(stream, carretera);
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Objeto Carretera enviado al cliente con 1 vehículo.");
+
             
 
             cliente.Close();

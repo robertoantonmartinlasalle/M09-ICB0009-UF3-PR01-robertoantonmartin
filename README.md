@@ -357,6 +357,53 @@ En esta etapa no se realiza ninguna ejecución funcional, pero sí ha sido esenc
 
 ---
 
+## Etapa 2 – Envío del objeto Carretera desde el servidor al cliente
+
+### Objetivo
+
+Ampliar la simulación para que el servidor cree un objeto `Carretera`, añada el `Vehiculo` recibido del cliente y lo devuelva como respuesta. El cliente debe deserializar este objeto y mostrar en consola la información contenida en él. Esta etapa permite comprobar que el intercambio de objetos complejos (listas de vehículos) funciona correctamente.
+
+---
+
+### Explicación técnica
+
+- Tras recibir el objeto `Vehiculo`, el **servidor** crea un objeto `Carretera` y utiliza el método `AñadirVehiculo()` para incluir el vehículo recibido.
+- Luego, el servidor envía este objeto `Carretera` al cliente utilizando el método `EscribirDatosCarreteraNS()` desde la clase `NetworkStreamClass`.
+- En el **cliente**, el objeto `Carretera` es recibido con `LeerDatosCarreteraNS()` y se deserializa automáticamente.
+- Finalmente, el cliente muestra en consola la **posición de los vehículos en la carretera** usando el método `MostrarBicicletas()`.
+- La comunicación sigue utilizando `NetworkStream`, y los objetos viajan como XML serializado, exactamente como en etapas anteriores.
+
+---
+
+### Resultado de la prueba
+
+- El **servidor**:
+  - Recibe el vehículo.
+  - Lo añade a una nueva instancia de `Carretera`.
+  - Envía el objeto completo al cliente.
+  - Muestra en consola que ha enviado correctamente la carretera con un vehículo.
+
+- El **cliente**:
+  - Recibe correctamente el objeto `Carretera`.
+  - Muestra por consola la posición de los vehículos, que en esta etapa es siempre `0` (posición inicial).
+
+---
+
+### Captura de pantalla
+
+![Etapa 2 - Cliente recibe objeto carretera](./img/etapa2ej2-carretera-recibida.png)
+
+---
+
+### Comentario personal
+
+Nota Importante: En este ejercicio 2 he tenido que modificar la clase NetworkStreamClass debido a que antes de realizar el commit accidentamente manipule el fichero y tenía  mal posicionada una llave, he tenido que corregirlo. (En la etapa 1 del ejercicio 2 como no tenía que probar la ejecución del programa no me había percatado del error)
+
+Esta etapa me ha permitido consolidar el uso de objetos más complejos como `Carretera`, que agrupan varios `Vehiculo`. Al simular el envío y recepción de este tipo de estructuras, se demuestra que el proyecto está preparado para manejar una lógica de simulación más rica en etapas futuras. Además, comprobar por consola las posiciones en la carretera me da una visión clara de que el sistema está funcionando como debe. Aunque de momento solo se añade un vehículo por carretera, esto servirá como base para enviar estados más completos de la simulación en tiempo real.
+
+---
+
+
 
 
 ##  Alumno

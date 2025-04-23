@@ -4,9 +4,9 @@ using System.Net;
 using System.Text;
 using System.IO;
 using System.Threading;
-using NetworkStreamNS;
-using CarreteraClass;
-using VehiculoClass;
+using NetworkStreamNS;       
+using CarreteraClass;        
+using VehiculoClass;         
 
 namespace Client
 {
@@ -49,6 +49,14 @@ namespace Client
                 // Envío el objeto serializado al servidor.
                 NetworkStreamClass.EscribirDatosVehiculoNS(stream, v);
                 Console.WriteLine("Vehículo enviado al servidor.");
+
+                // Etapa 2 Ejercicio 2: Recibo el objeto Carretera completo desde el servidor
+                Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
+                Console.WriteLine("Carretera recibida correctamente del servidor.");
+
+                // Muestro el estado de la carretera (posiciones de los vehículos)
+                Console.Write("Vehículos en carretera (posición): ");
+                carreteraRecibida.MostrarBicicletas();
             }
             catch (Exception e)
             {
