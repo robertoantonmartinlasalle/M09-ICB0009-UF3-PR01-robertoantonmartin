@@ -274,6 +274,50 @@ Esta etapa ha sido una de las más completas y realistas hasta el momento. He im
 
 ---
 
+## Etapa 7 - Gestión de clientes conectados
+
+### Objetivo
+
+Mantener una lista en el servidor con todos los clientes que se conectan, incluyendo su `ID` y su `NetworkStream`, para permitir futuras comunicaciones con ellos. Esta etapa establece la base para simular una carretera con varios vehículos activos que pueden ser consultados o gestionados desde el servidor.
+
+---
+
+### Explicación técnica
+
+- He creado una clase `ClienteConectado` para almacenar el `ID` y el `NetworkStream` de cada cliente.
+- En el servidor, he declarado una lista global `listaClientes` protegida con un `lock` para evitar conflictos en entornos multihilo.
+- En el método `GestionarCliente()`, después de asignar el `ID` y obtener el `NetworkStream`, añado el nuevo cliente a la lista compartida.
+- Cada vez que un nuevo cliente se conecta, se registra en esta lista con un mensaje en consola indicando el número total de conectados.
+- **Nota importante:** en esta etapa, los clientes no se eliminan automáticamente de la lista al cerrar su conexión, ya que aún no hemos implementado un mecanismo de seguimiento del estado en tiempo real. La lista refleja los vehículos activos durante la sesión de trabajo.
+
+---
+
+### Resultado de la prueba
+
+- El servidor muestra por consola:
+  - La asignación de ID y dirección.
+  - La adición del cliente a la lista.
+  - El número total de clientes conectados actualizado correctamente.
+- La lista `listaClientes` se va llenando conforme nuevos clientes se conectan, lo que me permite disponer de un registro completo.
+- No se eliminan de forma inmediata tras la desconexión, ya que todavía no se gestiona un control de estado en tiempo real.
+
+---
+
+### Captura de pantalla
+
+![Gestión de clientes conectados - Etapa 7](./img/etapa7-clientes-conectados.png)
+
+---
+
+### Comentario personal
+
+EEsta etapa ha sido una de las más completas y realistas hasta el momento. He implementado un protocolo de comunicación entre cliente y servidor que simula de forma fiel la inicialización de un vehículo en una red distribuida. Me ha ayudado a comprender mejor el flujo de intercambio de datos en entornos con múltiples hilos y cómo estructurar la lógica para que los datos viajen de forma segura y estructurada.
+
+En esta fase también he comenzado a gestionar una lista de clientes conectados, lo que me permitirá mantener el control de qué vehículos están activos en la simulación. Aunque por ahora no elimino a los clientes automáticamente tras su desconexión, esta lógica se añadirá más adelante, cuando el servidor deba mantener en tiempo real el estado de los vehículos.
+
+---
+
+
 
 
 ##  Alumno

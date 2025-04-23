@@ -4,20 +4,37 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic; // Lo añado para la lista de la etapa 7.
 using NetworkStreamNS;
 using CarreteraClass;
 using VehiculoClass;
 
 namespace Servidor
 {
+    // Etapa 7: Creo una clase que me permitirá guardar la información de cada cliente
+    public class ClienteConectado
+    {
+        public int Id { get; set; }
+        public NetworkStream Stream { get; set; }
+
+        public ClienteConectado(int id, NetworkStream stream)
+        {
+            Id = id;
+            Stream = stream;
+        }
+    }
     class Program
     {
         // Contador global de IDs que se autoincrementará para cada cliente.
         static int contadorId = 1;
 
+        // Lista de todos los clientes conectados (etapa 7)
+        static List<ClienteConectado> listaClientes = new List<ClienteConectado>();
+
         // Objeto de bloqueo para asegurar que solo un hilo a la vez modifica el ID.
         static readonly object lockId = new object();
-
+        static readonly object lockLista = new object();
+        
         static void Main(string[] args)
         {
             // En esta etapa, modifico el servidor para aceptar múltiples clientes al mismo tiempo.
@@ -67,6 +84,12 @@ namespace Servidor
             direccion = new Random().Next(2) == 0 ? "Norte" : "Sur";
 
             Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] ID asignado: {idAsignado} - Dirección: {direccion}");
+            // Etapa 7: Añado el cliente a la lista global de clientes conectados
+            lock (lockLista)
+            {
+                listaClientes.Add(new ClienteConectado(idAsignado, stream));
+                Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Cliente añadido a la lista. Total conectados: {listaClientes.Count}");
+            }
 
             // Envío el ID al cliente como respuesta.
             NetworkStreamClass.EscribirMensajeNetworkStream(stream, idAsignado.ToString());
@@ -96,6 +119,8 @@ namespace Servidor
             Console.WriteLine($"  Posición inicial: {vehiculoRecibido.Pos}");
             Console.WriteLine($"  Acabado: {vehiculoRecibido.Acabado}");
             Console.WriteLine($"  Parado: {vehiculoRecibido.Parado}");
+
+            
 
             cliente.Close();
         }
