@@ -23,53 +23,79 @@ namespace Servidor
             // En esta etapa, modifico el servidor para aceptar múltiples clientes al mismo tiempo.
             int puerto = 13000;
 
-            // TcpListener escucha conexiones entrantes en cualquier dirección IP local.
             TcpListener servidor = new TcpListener(IPAddress.Any, puerto);
             servidor.Start();
 
             Console.WriteLine("Servidor iniciado. Esperando conexiones de clientes...");
 
-            // Con este bucle, dejo el servidor siempre escuchando y aceptando nuevos clientes.
             while (true)
             {
-                // Acepto la conexión del cliente.
                 TcpClient clienteConectado = servidor.AcceptTcpClient();
                 Console.WriteLine("Cliente conectado.");
 
-                // Por cada cliente conectado, creo un nuevo hilo que lo atienda de forma independiente.
                 Thread hiloCliente = new Thread(() => GestionarCliente(clienteConectado));
                 hiloCliente.Start();
             }
         }
 
-        // Este método será ejecutado por cada hilo individual.
-        // Ahora asigno un ID único y una dirección aleatoria al cliente.
         static void GestionarCliente(TcpClient cliente)
         {
+            // Obtengo el stream para comunicarme con el cliente.
+            NetworkStream stream = cliente.GetStream();
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] NetworkStream obtenido correctamente.");
+
+            // Etapa 6: Espero el mensaje "INICIO" del cliente.
+            string mensajeInicio = NetworkStreamClass.LeerMensajeNetworkStream(stream);
+            if (mensajeInicio != "INICIO")
+            {
+                Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Error: no se recibió 'INICIO'.");
+                cliente.Close();
+                return;
+            }
+
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Mensaje 'INICIO' recibido correctamente.");
+
+            // Asigno ID y dirección como en etapas anteriores.
             int idAsignado;
             string direccion;
-
-            // Bloqueo para que los hilos no se pisen al asignar ID.
             lock (lockId)
             {
                 idAsignado = contadorId;
                 contadorId++;
             }
 
-            // Genero dirección aleatoria para el vehículo (Norte o Sur).
-            Random rnd = new Random();
-            direccion = rnd.Next(2) == 0 ? "Norte" : "Sur";
+            direccion = new Random().Next(2) == 0 ? "Norte" : "Sur";
 
-            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Vehículo conectado. ID asignado: {idAsignado} - Dirección: {direccion}");
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] ID asignado: {idAsignado} - Dirección: {direccion}");
 
-            // Etapa 4: obtención del NetworkStream
-            NetworkStream stream = cliente.GetStream();
-            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] NetworkStream obtenido correctamente.");
+            // Envío el ID al cliente como respuesta.
+            NetworkStreamClass.EscribirMensajeNetworkStream(stream, idAsignado.ToString());
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] ID enviado al cliente.");
 
-            // Etapa 5: envío de mensaje de bienvenida al cliente
-            string mensaje = $"Bienvenido, Vehículo {idAsignado}. Dirección: {direccion}";
-            NetworkStreamClass.EscribirMensajeNetworkStream(stream, mensaje);
-            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Mensaje enviado al cliente: {mensaje}");
+            // Espero la confirmación del mismo ID.
+            string confirmacion = NetworkStreamClass.LeerMensajeNetworkStream(stream);
+            if (confirmacion == idAsignado.ToString())
+            {
+                Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Confirmación recibida del cliente con ID: {confirmacion}");
+            }
+            else
+            {
+                Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Error: el cliente ha confirmado un ID incorrecto.");
+                cliente.Close();
+                return;
+            }
+
+            // Una vez confirmado, recibo el objeto Vehiculo.
+            Vehiculo vehiculoRecibido = NetworkStreamClass.LeerDatosVehiculoNS(stream);
+
+            // Muestro los datos del vehículo recibido por consola.
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Vehículo recibido:");
+            Console.WriteLine($"  ID: {vehiculoRecibido.Id}");
+            Console.WriteLine($"  Dirección: {vehiculoRecibido.Direccion}");
+            Console.WriteLine($"  Velocidad: {vehiculoRecibido.Velocidad}");
+            Console.WriteLine($"  Posición inicial: {vehiculoRecibido.Pos}");
+            Console.WriteLine($"  Acabado: {vehiculoRecibido.Acabado}");
+            Console.WriteLine($"  Parado: {vehiculoRecibido.Parado}");
 
             cliente.Close();
         }

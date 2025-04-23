@@ -215,6 +215,65 @@ Utilizar el `NetworkStream` para enviar desde el servidor un mensaje de bienveni
 
 Esta etapa ha sido un punto de inflexión porque me ha permitido implementar la primera comunicación real entre el servidor y el cliente. Gracias a los métodos ya preparados en la clase `NetworkStreamClass`, ha sido más fácil comprender cómo se transmiten datos a través de la red en forma de bytes y cómo leerlos correctamente. He validado que cada hilo tiene su propio `NetworkStream` y que el mensaje enviado llega de forma íntegra al cliente. Esto será clave en las etapas siguientes cuando trabajemos con objetos completos como `Vehiculo` y `Carretera`.
 
+---
+
+## Etapa 6 - Protocolo completo: INICIO, ID y envío de Vehículo
+
+### Objetivo
+
+Implementar un protocolo básico de comunicación cliente-servidor que incluya los siguientes pasos:
+1. El cliente envía un mensaje inicial `'INICIO'`.
+2. El servidor responde con el ID asignado y la dirección.
+3. El cliente confirma la recepción del ID.
+4. El cliente crea y envía un objeto `Vehiculo` con los datos correspondientes.
+
+Esta secuencia simula el proceso de inicialización de un vehículo antes de incorporarse a la carretera.
+
+---
+
+### Explicación técnica
+
+- El **cliente** comienza enviando el mensaje `'INICIO'` al servidor utilizando `EscribirMensajeNetworkStream()`.
+- El **servidor** recibe este mensaje, lo muestra por consola y asigna un ID y dirección al nuevo cliente.
+- El servidor **envía este ID al cliente** como texto para su identificación.
+- El cliente **recibe el ID**, lo analiza desde el mensaje, y lo **envía de vuelta como confirmación**.
+- A continuación, el cliente **crea un objeto `Vehiculo`** real con ese ID y dirección.
+- Finalmente, el cliente envía el objeto completo al servidor utilizando `EscribirDatosVehiculoNS()`.
+
+En el lado del servidor, el objeto se recibe con `LeerDatosVehiculoNS()` y se deserializa automáticamente utilizando XML. El servidor muestra por consola todos los datos recibidos para verificar que la comunicación se ha realizado correctamente.
+
+---
+
+### Resultado de la prueba
+
+- En consola del servidor se observa:
+  - El mensaje `'INICIO'` recibido correctamente.
+  - La asignación de un ID y una dirección.
+  - El ID enviado al cliente.
+  - La confirmación del ID desde el cliente.
+  - La recepción del objeto `Vehiculo` completo y sus atributos mostrados por consola.
+- En consola del cliente se ve:
+  - Confirmación de conexión.
+  - Mensaje `'INICIO'` enviado al servidor.
+  - ID recibido desde el servidor.
+  - ID confirmado al servidor.
+  - Creación del objeto `Vehiculo` con ID y dirección reales.
+  - Vehículo enviado al servidor correctamente.
+
+---
+
+### Captura de pantalla
+
+![Protocolo completo de conexión y envío - Etapa 6](./img/etapa6-protocolo-vehiculo.png)
+
+---
+
+### Comentario personal
+
+Esta etapa ha sido una de las más completas y realistas hasta el momento. He implementado un protocolo de comunicación entre cliente y servidor que simula de forma fiel la inicialización de un vehículo en una red distribuida. Me ha ayudado a comprender mejor el flujo de intercambio de datos en entornos con múltiples hilos y cómo estructurar la lógica para que los datos viajen de forma segura y estructurada. Gracias a la serialización XML, puedo enviar y recibir objetos completos de tipo `Vehiculo` sin tener que preocuparme por la conversión manual de propiedades.
+
+---
+
 
 
 ##  Alumno
