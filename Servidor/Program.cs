@@ -23,6 +23,7 @@ namespace Servidor
             Stream = stream;
         }
     }
+
     class Program
     {
         // Contador global de IDs que se autoincrementará para cada cliente.
@@ -31,10 +32,14 @@ namespace Servidor
         // Lista de todos los clientes conectados (etapa 7)
         static List<ClienteConectado> listaClientes = new List<ClienteConectado>();
 
-        // Objeto de bloqueo para asegurar que solo un hilo a la vez modifica el ID.
+        // Etapa 3 - Ejercicio 2: Creo una carretera global para simular varios vehículos en movimiento.
+        static Carretera carreteraGlobal = new Carretera();
+
+        // Objetos de bloqueo para concurrencia segura
         static readonly object lockId = new object();
         static readonly object lockLista = new object();
-        
+        static readonly object lockCarretera = new object();
+
         static void Main(string[] args)
         {
             // En esta etapa, modifico el servidor para aceptar múltiples clientes al mismo tiempo.
@@ -84,6 +89,7 @@ namespace Servidor
             direccion = new Random().Next(2) == 0 ? "Norte" : "Sur";
 
             Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] ID asignado: {idAsignado} - Dirección: {direccion}");
+            
             // Etapa 7: Añado el cliente a la lista global de clientes conectados
             lock (lockLista)
             {
@@ -108,27 +114,47 @@ namespace Servidor
                 return;
             }
 
-            // Una vez confirmado, recibo el objeto Vehiculo.
-            Vehiculo vehiculoRecibido = NetworkStreamClass.LeerDatosVehiculoNS(stream);
+            // Una vez confirmado, empiezo a recibir actualizaciones del vehículo en bucle
+            while (true)
+            {
+                try
+                {
+                    // Recibo el vehículo actualizado desde el cliente
+                    Vehiculo vehiculoRecibido = NetworkStreamClass.LeerDatosVehiculoNS(stream);
 
-            // Muestro los datos del vehículo recibido por consola.
-            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Vehículo recibido:");
-            Console.WriteLine($"  ID: {vehiculoRecibido.Id}");
-            Console.WriteLine($"  Dirección: {vehiculoRecibido.Direccion}");
-            Console.WriteLine($"  Velocidad: {vehiculoRecibido.Velocidad}");
-            Console.WriteLine($"  Posición inicial: {vehiculoRecibido.Pos}");
-            Console.WriteLine($"  Acabado: {vehiculoRecibido.Acabado}");
-            Console.WriteLine($"  Parado: {vehiculoRecibido.Parado}");
+                    // Muestro los datos recibidos por consola
+                    /*
+                    Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Vehículo recibido:");
+                    Console.WriteLine($"  ID: {vehiculoRecibido.Id}");
+                    Console.WriteLine($"  Dirección: {vehiculoRecibido.Direccion}");
+                    Console.WriteLine($"  Velocidad: {vehiculoRecibido.Velocidad}");
+                    Console.WriteLine($"  Posición: {vehiculoRecibido.Pos}");
+                    Console.WriteLine($"  Acabado: {vehiculoRecibido.Acabado}");
+                    Console.WriteLine($"  Parado: {vehiculoRecibido.Parado}");
+                    */
 
-            // Etapa 2 (Ejercicio 2): Creo el objeto Carretera y añado el vehículo recibido
-            Carretera carretera = new Carretera();
-            carretera.AñadirVehiculo(vehiculoRecibido);
+                    // Etapa 3: Actualizo la carretera global con el nuevo estado del vehículo
+                    lock (lockCarretera)
+                    {
+                        carreteraGlobal.ActualizarVehiculo(vehiculoRecibido);
+                    }
 
-            // Envío el objeto Carretera al cliente usando la clase NetworkStreamClass
-            NetworkStreamClass.EscribirDatosCarreteraNS(stream, carretera);
-            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Objeto Carretera enviado al cliente con 1 vehículo.");
+                    // Devuelvo al cliente el estado completo de la carretera
+                    NetworkStreamClass.EscribirDatosCarreteraNS(stream, carreteraGlobal);
+                    // Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Estado actualizado de la carretera enviado al cliente.");
 
-            
+                    if (vehiculoRecibido.Pos >= 100)
+                    {
+                        Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] El vehículo {vehiculoRecibido.Id} ha llegado a destino.");
+                        break;
+                    }
+                }
+                catch (IOException)
+                {
+                    Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Error: el cliente se ha desconectado inesperadamente.");
+                    break;
+                }
+            }
 
             cliente.Close();
         }

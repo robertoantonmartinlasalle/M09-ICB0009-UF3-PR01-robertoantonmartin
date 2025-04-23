@@ -403,6 +403,57 @@ Esta etapa me ha permitido consolidar el uso de objetos más complejos como `Car
 
 ---
 
+## Etapa 3 – Simulación continua de avance de los vehículos
+
+### Objetivo
+
+Simular de forma realista el avance de los vehículos en la carretera, enviando al servidor actualizaciones periódicas de su estado. El servidor debe actualizar su estado global de la carretera y devolverlo al cliente. Esta etapa permite observar cómo se va construyendo una simulación distribuida de tráfico, en la que múltiples vehículos circulan y comparten la carretera en tiempo real.
+
+---
+
+### Explicación técnica
+
+- En el **cliente**, se ha programado un bucle donde el objeto `Vehiculo` avanza de 10 en 10 km hasta alcanzar los 100 km.
+- En cada iteración:
+  - Se actualiza la posición del vehículo.
+  - Se marca como `Acabado = true` al llegar al destino.
+  - Se envía el objeto `Vehiculo` al servidor.
+  - Se recibe desde el servidor un objeto `Carretera` actualizado.
+  - Se imprime la lista de posiciones de todos los vehículos activos en ese momento.
+- En el **servidor**:
+  - Se ha creado una **carretera global** (`carreteraGlobal`) que almacena todos los vehículos de todos los clientes conectados.
+  - Cuando recibe un `Vehiculo`, lo actualiza con el método `ActualizarVehiculo()` (que añade el vehículo si es nuevo o modifica su estado si ya existe).
+  - Luego devuelve al cliente el estado completo de la carretera.
+- Se han utilizado `lock` para asegurar el acceso concurrente a la carretera compartida por múltiples hilos.
+
+---
+
+### Resultado de la prueba
+
+- El sistema ha sido probado con **dos clientes en paralelo**, cada uno avanzando su vehículo y actualizando su estado en la carretera.
+- En consola del cliente se observa:
+  - La posición actual del vehículo en cada paso.
+  - El listado actualizado de posiciones de todos los vehículos en carretera.
+  - La finalización del trayecto cuando el vehículo llega a los 100 km.
+- En consola del servidor se observa:
+  - Los datos recibidos de cada vehículo.
+  - La confirmación de llegada al destino para cada uno.
+
+---
+
+### Captura de pantalla
+
+![Etapa 3 - Avance de vehículos en carretera](./img/etapa3ej2-vehiculos-movimiento.png)
+
+---
+
+### Comentario personal
+
+Esta ha sido la etapa que más me ha acercado a una simulación real. He visto cómo, cliente a cliente, se va construyendo una visión compartida del estado de la carretera. Me ha permitido entender cómo aplicar técnicas de concurrencia (`lock`), cómo mantener estructuras compartidas seguras, y cómo simular el tiempo real mediante bucles y `Thread.Sleep()`.
+
+Al principio usaba la propiedad `Velocidad`, pero en esta versión decidí avanzar en bloques fijos de 10 km para asegurar control visual de cada paso. En versiones futuras puedo vincular `Sleep()` o el paso de avance a la velocidad real del vehículo.
+
+El sistema es ahora **concurrente, distribuido y progresivo**, y refleja de forma clara cómo múltiples clientes pueden trabajar sobre una simulación compartida.
 
 
 

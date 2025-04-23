@@ -38,7 +38,7 @@ namespace Client
                 NetworkStreamClass.EscribirMensajeNetworkStream(stream, id.ToString());
                 Console.WriteLine("ID confirmado al servidor.");
 
-                // Asigno dirección aleatoria al vehículo (aunque no sea necesaria para esta etapa, ya la preparo).
+                // Asigno dirección aleatoria al vehículo 
                 string direccion = new Random().Next(2) == 0 ? "Norte" : "Sur";
 
                 // Creo el objeto Vehiculo con los datos reales.
@@ -46,21 +46,43 @@ namespace Client
                 v.Id = id;
                 v.Direccion = direccion;
 
-                // Envío el objeto serializado al servidor.
-                NetworkStreamClass.EscribirDatosVehiculoNS(stream, v);
-                Console.WriteLine("Vehículo enviado al servidor.");
+                // Fuerzo la posición inicial a 0 para evitar avanzar de golpe
+                v.Pos = 0;
 
-                // Etapa 2 Ejercicio 2: Recibo el objeto Carretera completo desde el servidor
-                Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
-                Console.WriteLine("Carretera recibida correctamente del servidor.");
+                // Etapa 3 Ejercicio 2: simulo el avance del vehículo en bucle
+                while (!v.Acabado)
+                {
+                    // Avanzo el vehículo manualmente de 10 en 10 km
+                    v.Pos += 10;
 
-                // Muestro el estado de la carretera (posiciones de los vehículos)
-                Console.Write("Vehículos en carretera (posición): ");
-                carreteraRecibida.MostrarBicicletas();
+                    // Si llega a los 100 km, marco como acabado
+                    if (v.Pos >= 100)
+                    {
+                        v.Pos = 100;
+                        v.Acabado = true;
+                    }
+
+                    // Envío el estado actualizado del vehículo al servidor
+                    NetworkStreamClass.EscribirDatosVehiculoNS(stream, v);
+                    Console.WriteLine($"→ Vehículo enviado al servidor - Posición: {v.Pos} km");
+
+                    // Recibo el objeto Carretera completo actualizado
+                    Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
+                    // Console.WriteLine("✓ Carretera recibida correctamente del servidor.");
+
+                    // Muestro el estado actual de la carretera
+                    Console.Write("Vehículos en carretera (posición): ");
+                    carreteraRecibida.MostrarBicicletas();
+
+                    // Espero 1 segundo para simular el tiempo de avance
+                    Thread.Sleep(1000);
+                }
+
+                Console.WriteLine(" Vehículo ha llegado a destino. Fin de la simulación.");
             }
             catch (Exception e)
             {
-                Console.WriteLine("No se pudo conectar al servidor: " + e.Message);
+                Console.WriteLine(" No se pudo conectar al servidor: " + e.Message);
             }
 
             Console.WriteLine("Pulsa ENTER para cerrar el cliente.");
