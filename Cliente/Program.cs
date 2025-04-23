@@ -22,6 +22,10 @@ namespace Client
             {
                 cliente.Connect("127.0.0.1", 13000);
                 Console.WriteLine("Conectado al servidor correctamente.");
+                // Etapa 5: Obtener el NetworkStream y leer el mensaje
+                NetworkStream stream = cliente.GetStream();
+                string mensajeServidor = NetworkStreamClass.LeerMensajeNetworkStream(stream);
+                Console.WriteLine("Mensaje recibido del servidor: " + mensajeServidor);
             }
             catch (Exception e)
             {

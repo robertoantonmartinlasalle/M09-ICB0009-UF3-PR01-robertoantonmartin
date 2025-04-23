@@ -66,6 +66,11 @@ namespace Servidor
             NetworkStream stream = cliente.GetStream();
             Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] NetworkStream obtenido correctamente.");
 
+            // Etapa 5: envío de mensaje de bienvenida al cliente
+            string mensaje = $"Bienvenido, Vehículo {idAsignado}. Dirección: {direccion}";
+            NetworkStreamClass.EscribirMensajeNetworkStream(stream, mensaje);
+            Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Mensaje enviado al cliente: {mensaje}");
+
             cliente.Close();
         }
     }
