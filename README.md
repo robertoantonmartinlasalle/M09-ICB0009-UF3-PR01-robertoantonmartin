@@ -317,6 +317,45 @@ En esta fase también he comenzado a gestionar una lista de clientes conectados,
 
 ---
 
+# Ejercicio 2 – Simulación de carretera con objetos `Carretera`
+
+A partir de esta sección comienza el segundo ejercicio de la práctica, que se centra en simular la carretera como un conjunto de vehículos y gestionar dicha información entre cliente y servidor utilizando objetos complejos. En esta primera etapa, nos enfocamos únicamente en **implementar la lógica de serialización y deserialización** para los objetos `Carretera`, sin necesidad de ejecutar pruebas funcionales todavía.
+
+---
+
+## Etapa 1 – Programación de métodos NetworkStreamClass para Carretera
+
+### Objetivo
+
+Implementar los métodos necesarios en la clase `NetworkStreamClass` que permitan el envío y la recepción de objetos `Carretera` a través de un `NetworkStream`. Esta funcionalidad será clave para permitir que el servidor y el cliente puedan intercambiar información sobre el estado de todos los vehículos que circulan por la carretera.
+
+---
+
+### Explicación técnica
+
+- He reutilizado los métodos ya definidos en la clase `Carretera` para serializar (`CarreteraABytes()`) y deserializar (`BytesACarretera()`).
+- En `NetworkStreamClass` he añadido dos métodos:
+  - `EscribirDatosCarreteraNS(NetworkStream, Carretera)`: convierte el objeto en un array de bytes y lo escribe en el stream.
+  - `LeerDatosCarreteraNS(NetworkStream)`: reconstruye el objeto `Carretera` leyendo los bytes del stream.
+- La estructura sigue el mismo patrón ya utilizado para los objetos `Vehiculo`, por lo que he podido reutilizar conceptos previos.
+- He aumentado el tamaño del buffer para asegurar la recepción de todos los datos del objeto `Carretera`, que puede contener varios vehículos.
+
+---
+
+### Código implicado
+
+- Archivo modificado: `NetworkStreamClass.cs`
+- Métodos añadidos:
+  - `EscribirDatosCarreteraNS(NetworkStream, Carretera)`
+  - `LeerDatosCarreteraNS(NetworkStream)`
+
+---
+
+### Comentario personal
+
+En esta etapa no se realiza ninguna ejecución funcional, pero sí ha sido esencial implementar correctamente la serialización de objetos complejos como `Carretera`, que contienen listas de vehículos. Me ha permitido comprender cómo empaquetar estructuras más grandes para transmitirlas entre procesos de forma eficiente. Esta etapa sienta las bases para las siguientes, donde comenzaremos a trabajar con lógica de avance, simulación de posiciones y actualizaciones entre el cliente y el servidor.
+
+---
 
 
 

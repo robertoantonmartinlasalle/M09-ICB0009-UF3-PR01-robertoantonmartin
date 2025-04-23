@@ -14,15 +14,37 @@ namespace NetworkStreamNS
         //Método para escribir en un NetworkStream los datos de tipo Carretera
         public static void  EscribirDatosCarreteraNS(NetworkStream NS, Carretera C)
         {            
+            // Serializo el objeto Carretera a un array de bytes usando el método que ya estaba definido en la clase Carretera.
+            byte[] datos = C.CarreteraABytes();
+            
+            // Escribo directamente los bytes al NetworkStream.
+            NS.Write(datos, 0, datos.Length);
                             
         }
 
         //Metódo para leer de un NetworkStream los datos que de un objeto Carretera
-        /*public static Carretera LeerDatosCarreteraNS (NetworkStream NS)
+        public static Carretera LeerDatosCarreteraNS (NetworkStream NS)
         {
-            
+            byte[] buffer = new byte[4096]; // Tamaño suficiente para recibir toda la carretera
+            int totalBytes = 0;
+            MemoryStream tmpStream = new MemoryStream();
 
-        }*/
+            // Leo los datos del NetworkStream mientras haya disponibles
+            do
+            {
+                int bytesLeidos = NS.Read(buffer, 0, buffer.Length);
+                tmpStream.Write(buffer, 0, bytesLeidos);
+                totalBytes += bytesLeidos;
+            }
+            while (NS.DataAvailable);
+
+            byte[] datosRecibidos = tmpStream.ToArray();
+
+            // Deserializo los datos recibidos a un objeto Carretera
+            return Carretera.BytesACarretera(datosRecibidos);
+        
+            
+        }
 
         //Método para enviar datos de tipo Vehiculo en un NetworkStream
         public static void  EscribirDatosVehiculoNS(NetworkStream NS, Vehiculo V)
@@ -81,4 +103,4 @@ namespace NetworkStreamNS
         }                          
 
     }
-}
+
