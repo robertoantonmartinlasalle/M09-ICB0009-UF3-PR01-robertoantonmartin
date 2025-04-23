@@ -179,6 +179,43 @@ Obtener el objeto `NetworkStream` para cada cliente que se conecta al servidor. 
 
 Esta etapa me ha servido para preparar la base de la comunicación bidireccional entre el cliente y el servidor. Aunque todavía no se intercambian datos, el hecho de obtener el `NetworkStream` correctamente me ha hecho entender cómo funciona este canal y cómo será utilizado en las etapas siguientes para leer y escribir mensajes entre ambas partes. También me ha permitido asegurar que cada hilo tiene su propio stream, lo que facilitará una gestión ordenada de cada cliente.
 
+---
+
+## Etapa 5 - Envío y lectura de mensaje con NetworkStream
+
+### Objetivo
+
+Utilizar el `NetworkStream` para enviar desde el servidor un mensaje de bienvenida a cada cliente conectado, y que el cliente lo lea correctamente utilizando los métodos definidos en la clase `NetworkStreamClass`.
+
+---
+
+### Explicación técnica
+
+- He utilizado el método `EscribirMensajeNetworkStream()` desde el servidor para enviar al cliente un mensaje de bienvenida personalizado con su ID y dirección.
+- En el cliente, se ha utilizado `LeerMensajeNetworkStream()` para recibir el mensaje enviado por el servidor y mostrarlo por consola.
+- Estos métodos están definidos en la clase `NetworkStreamClass`, la cual trabaja con arrays de bytes codificados en Unicode y permite intercambiar texto de forma segura.
+
+---
+
+### Resultado de la prueba
+
+- El servidor envía correctamente el mensaje al cliente justo después de que este se conecta.
+- El cliente recibe el mensaje y lo muestra en consola de manera inmediata.
+- Ambos lados muestran trazas claras del envío y la recepción, permitiendo confirmar el correcto funcionamiento del canal `NetworkStream`.
+
+---
+
+### Captura de pantalla
+
+![Comunicación por NetworkStream - Etapa 5](./img/etapa5-networkstream-comunicacion.png)
+
+---
+
+### Comentario personal
+
+Esta etapa ha sido un punto de inflexión porque me ha permitido implementar la primera comunicación real entre el servidor y el cliente. Gracias a los métodos ya preparados en la clase `NetworkStreamClass`, ha sido más fácil comprender cómo se transmiten datos a través de la red en forma de bytes y cómo leerlos correctamente. He validado que cada hilo tiene su propio `NetworkStream` y que el mensaje enviado llega de forma íntegra al cliente. Esto será clave en las etapas siguientes cuando trabajemos con objetos completos como `Vehiculo` y `Carretera`.
+
+
 
 ##  Alumno
 
