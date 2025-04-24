@@ -455,6 +455,28 @@ Al principio usaba la propiedad `Velocidad`, pero en esta versión decidí avanz
 
 El sistema es ahora **concurrente, distribuido y progresivo**, y refleja de forma clara cómo múltiples clientes pueden trabajar sobre una simulación compartida.
 
+---
+
+### 🔧 **Ampliación: Implementación real de la velocidad del vehículo**
+
+Conforme a las instrucciones del enunciado del ejercicio, se ha implementado el uso del atributo `Velocidad` del vehículo para controlar el **tiempo entre cada avance**. Este valor (aleatorio) se genera al construir el objeto `Vehiculo` y se aplica directamente al `Thread.Sleep(...)` del cliente.
+
+Además, se imprime por consola la velocidad generada para facilitar la interpretación visual durante las pruebas.
+
+---
+
+### Nueva Captura de pantalla
+
+![Etapa 3 - Vehículos con velocidad implementada](./img/etapa3ej2-vehiculos-velocidad.png)
+
+---
+
+### Comentario final de etapa
+
+Ahora cada vehículo avanza de forma independiente no solo en posición, sino también en **tiempo de espera**. La carretera es compartida, el estado es sincronizado y el comportamiento ya no es uniforme: **cada vehículo tiene su propio ritmo**, como en la vida real.
+
+---
+
 ## Etapa 4 – Envío del estado global de la carretera a todos los clientes conectados
 
 ### Objetivo
