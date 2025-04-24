@@ -52,7 +52,7 @@ namespace Client
                 // Muestro por pantalla la velocidad generada para tener contexto
                 Console.WriteLine($"→ Velocidad del vehículo: {v.Velocidad} ms entre cada paso.");
 
-                // Etapa 3 Ejercicio 2: simulo el avance del vehículo en bucle
+                // Etapa 3 y 5: simulo el avance del vehículo en bucle y recibo carretera
                 while (!v.Acabado)
                 {
                     // Avanzo el vehículo manualmente de 10 en 10 km
@@ -67,27 +67,27 @@ namespace Client
 
                     // Envío el estado actualizado del vehículo al servidor
                     NetworkStreamClass.EscribirDatosVehiculoNS(stream, v);
-                    Console.WriteLine($"→ Vehículo enviado al servidor - Posición: {v.Pos} km");
+                    Console.WriteLine($"\n→ Vehículo enviado al servidor - Posición: {v.Pos} km");
 
-                    // Recibo el objeto Carretera completo actualizado
+                    // Recibo el objeto Carretera completo actualizado desde el servidor
                     Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
 
-                    // Etapa 3 (mejora visual): ordeno la lista por posición para una lectura más clara
+                    // Ordeno la lista por posición para mayor claridad visual
                     carreteraRecibida.VehiculosEnCarretera.Sort((a, b) => a.Pos.CompareTo(b.Pos));
 
                     // Muestro el estado actual de la carretera
-                    Console.Write("Vehículos en carretera (posición): ");
+                    Console.WriteLine("[Actualización desde servidor] Vehículos en carretera (posición):");
                     carreteraRecibida.MostrarBicicletas();
 
-                    // Etapa 3 (corregida): espero un tiempo proporcional a la velocidad
-                    Thread.Sleep(v.Velocidad);  // ← Tiempo entre pasos según la velocidad
+                    // Espero un tiempo proporcional a la velocidad
+                    Thread.Sleep(v.Velocidad); // ← Tiempo entre pasos según velocidad
                 }
 
-                Console.WriteLine("✓ Vehículo ha llegado a destino. Fin de la simulación.");
+                Console.WriteLine(" Vehículo ha llegado a destino. Fin de la simulación.");
             }
             catch (Exception e)
             {
-                Console.WriteLine(" No se pudo conectar al servidor: " + e.Message);
+                Console.WriteLine(" Error: " + e.Message);
             }
 
             Console.WriteLine("Pulsa ENTER para cerrar el cliente.");

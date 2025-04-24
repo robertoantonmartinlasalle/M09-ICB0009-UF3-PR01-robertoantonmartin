@@ -524,6 +524,56 @@ Me siento especialmente satisfecho porque he conseguido que el servidor funcione
 La simulación es ahora completamente coherente entre todos los clientes activos.
 
 ---
+## Etapa 5 – Recepción en hilo secundario del estado de la carretera
+
+### Objetivo
+
+Separar la lógica de avance del vehículo y la lógica de recepción de actualizaciones para evitar bloqueos. El cliente ahora recibe el estado global de la carretera en **tiempo real y en paralelo**, usando un hilo secundario que escucha continuamente los mensajes del servidor.
+
+---
+
+### Explicación técnica
+
+- Se ha creado un **nuevo hilo secundario** en el cliente:
+  - Escucha el `NetworkStream`.
+  - Recibe objetos `Carretera` del servidor en tiempo real.
+  - Ordena los vehículos por posición para mostrar una visión clara y ordenada.
+  - Muestra la actualización por consola en todo momento.
+
+- Este hilo corre en paralelo al hilo principal del cliente, que se encarga de avanzar el vehículo, enviarlo al servidor y dormir según su velocidad.
+
+- Gracias a esta separación, la simulación se vuelve **más realista y fluida**, permitiendo que cada cliente **vea constantemente los movimientos de los demás** sin tener que esperar su propio avance.
+
+---
+
+### Resultado de la prueba
+
+- Cada cliente tiene su propio hilo receptor que muestra la evolución de la carretera aunque no haya avanzado todavía.
+- Al finalizar el trayecto, el vehículo deja de enviar información pero puede seguir recibiendo actualizaciones hasta que se cierre la conexión.
+- La información impresa en consola es **coherente y cronológicamente clara**, permitiendo visualizar perfectamente la posición de cada vehículo en cada instante.
+
+---
+
+### Capturas de pantalla 
+
+![Etapa 5 - Hilo receptor paralelo - Parte 1](./img/etapa5ej2-hilo-receptor-1.png)
+
+---
+
+![Etapa 5 - Hilo receptor paralelo - Parte 2](./img/etapa5ej2-hilo-receptor-2.png)
+
+---
+
+### Comentario personal
+
+Esta etapa ha supuesto un gran paso hacia una simulación totalmente **asíncrona y no bloqueante**.  
+Implementar el hilo receptor en segundo plano ha mejorado notablemente la experiencia visual, ya que permite ver cómo se mueve la carretera en tiempo real sin interferir con el avance del propio vehículo.
+
+Además, el código se ha vuelto más modular y robusto. Me ha servido para practicar la gestión de hilos concurrentes con `Thread` y comprobar cómo afecta la arquitectura cliente-servidor a la sincronización de datos.
+
+
+
+---
 
 
 
