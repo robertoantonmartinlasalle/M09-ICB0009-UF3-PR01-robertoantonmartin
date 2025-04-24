@@ -455,6 +455,54 @@ Al principio usaba la propiedad `Velocidad`, pero en esta versión decidí avanz
 
 El sistema es ahora **concurrente, distribuido y progresivo**, y refleja de forma clara cómo múltiples clientes pueden trabajar sobre una simulación compartida.
 
+## Etapa 4 – Envío del estado global de la carretera a todos los clientes conectados
+
+### Objetivo
+
+Actualizar el sistema para que el **servidor no solo devuelva la carretera al cliente que envió el vehículo**, sino que **envíe el estado global de la carretera a todos los clientes conectados**. Esto permite que todos los vehículos visualicen el estado compartido de la simulación en tiempo real.
+
+---
+
+### Explicación técnica
+
+- Se ha creado el método `EnviarCarreteraATodos()` en el servidor.
+- Este método recorre la lista `listaClientes` y envía la carretera actualizada a cada uno utilizando `NetworkStreamClass.EscribirDatosCarreteraNS()`.
+- Para evitar errores, se han añadido **bloques `try-catch`**:
+  - `IOException` para detectar desconexiones repentinas.
+  - `ObjectDisposedException` para detectar streams cerrados.
+- Si un cliente genera una excepción al enviarle la carretera, se añade a una **lista temporal de desconectados**, que luego se elimina de la lista de clientes conectados.
+- Se protege toda la operación con `lock (lockLista)` para evitar problemas de concurrencia.
+
+---
+
+### Resultado de la prueba
+
+- El sistema ha sido probado con **dos clientes activos**.
+- Ambos clientes reciben en tiempo real el estado de la carretera, incluyendo su propia posición y la del otro vehículo.
+- Si un cliente llega a destino y se cierra su conexión:
+  - El servidor detecta la excepción y elimina al cliente de forma segura.
+  - El resto de clientes sigue funcionando sin errores.
+- Se elimina correctamente el cliente desconectado y se muestra un mensaje en consola confirmando la limpieza de la lista.
+
+---
+
+### Captura de pantalla
+
+![Etapa 4 - Broadcast a todos los clientes](./img/etapa4ej2-broadcast.png)
+
+---
+
+### Comentario personal
+
+Esta etapa ha sido clave para alcanzar el comportamiento realista que exige una simulación distribuida: **todos los clientes deben tener una visión sincronizada del entorno**.  
+Al principio se producía un error `ObjectDisposedException` cuando el servidor intentaba escribir en un cliente ya finalizado.  
+He solucionado este error implementando una lógica para detectar y eliminar automáticamente a los clientes desconectados, evitando que el sistema falle.
+
+Me siento especialmente satisfecho porque he conseguido que el servidor funcione de forma **robusta y tolerante a fallos**, lo cual es fundamental en cualquier arquitectura multicliente.  
+La simulación es ahora completamente coherente entre todos los clientes activos.
+
+---
+
 
 
 ##  Alumno

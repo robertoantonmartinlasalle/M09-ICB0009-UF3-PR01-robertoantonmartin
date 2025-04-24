@@ -60,6 +60,45 @@ namespace Servidor
             }
         }
 
+        // Etapa 4 - Ejercicio 2: Envío del objeto Carretera actualizado a todos los clientes conectados
+        static void EnviarCarreteraATodos(Carretera carretera)
+        {
+            lock (lockLista)
+            {
+                // Lista temporal para guardar los clientes desconectados
+                List<ClienteConectado> clientesDesconectados = new List<ClienteConectado>();
+
+                foreach (var cliente in listaClientes)
+                {
+                    try
+                    {
+                        NetworkStreamClass.EscribirDatosCarreteraNS(cliente.Stream, carretera);
+                    }
+                    catch (IOException)
+                    {
+                        Console.WriteLine($"[Servidor] Error al enviar carretera al cliente con ID: {cliente.Id}. Lo marcaré como desconectado.");
+                        clientesDesconectados.Add(cliente);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        Console.WriteLine($"[Servidor] El stream del cliente {cliente.Id} ya estaba cerrado. Eliminando.");
+                        clientesDesconectados.Add(cliente);
+                    }
+                }
+
+                // Eliminamos todos los clientes cuyos streams fallaron
+                foreach (var desconectado in clientesDesconectados)
+                {
+                    listaClientes.Remove(desconectado);
+                }
+
+                if (clientesDesconectados.Count > 0)
+                {
+                    Console.WriteLine($"[Servidor] {clientesDesconectados.Count} cliente(s) eliminado(s) de la lista.");
+                }
+            }
+        }
+
         static void GestionarCliente(TcpClient cliente)
         {
             // Obtengo el stream para comunicarme con el cliente.
@@ -89,7 +128,7 @@ namespace Servidor
             direccion = new Random().Next(2) == 0 ? "Norte" : "Sur";
 
             Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] ID asignado: {idAsignado} - Dirección: {direccion}");
-            
+
             // Etapa 7: Añado el cliente a la lista global de clientes conectados
             lock (lockLista)
             {
@@ -122,26 +161,14 @@ namespace Servidor
                     // Recibo el vehículo actualizado desde el cliente
                     Vehiculo vehiculoRecibido = NetworkStreamClass.LeerDatosVehiculoNS(stream);
 
-                    // Muestro los datos recibidos por consola
-                    /*
-                    Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Vehículo recibido:");
-                    Console.WriteLine($"  ID: {vehiculoRecibido.Id}");
-                    Console.WriteLine($"  Dirección: {vehiculoRecibido.Direccion}");
-                    Console.WriteLine($"  Velocidad: {vehiculoRecibido.Velocidad}");
-                    Console.WriteLine($"  Posición: {vehiculoRecibido.Pos}");
-                    Console.WriteLine($"  Acabado: {vehiculoRecibido.Acabado}");
-                    Console.WriteLine($"  Parado: {vehiculoRecibido.Parado}");
-                    */
-
                     // Etapa 3: Actualizo la carretera global con el nuevo estado del vehículo
                     lock (lockCarretera)
                     {
                         carreteraGlobal.ActualizarVehiculo(vehiculoRecibido);
                     }
 
-                    // Devuelvo al cliente el estado completo de la carretera
-                    NetworkStreamClass.EscribirDatosCarreteraNS(stream, carreteraGlobal);
-                    // Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] Estado actualizado de la carretera enviado al cliente.");
+                    // Etapa 4: Envío el estado de la carretera a todos los clientes conectados
+                    EnviarCarreteraATodos(carreteraGlobal);
 
                     if (vehiculoRecibido.Pos >= 100)
                     {

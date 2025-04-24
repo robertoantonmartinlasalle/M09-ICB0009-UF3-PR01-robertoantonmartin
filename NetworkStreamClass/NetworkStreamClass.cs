@@ -12,27 +12,37 @@ namespace NetworkStreamNS
         // Método para escribir en un NetworkStream los datos de tipo Carretera
         public static void EscribirDatosCarreteraNS(NetworkStream NS, Carretera C)
         {
+            // Serializo el objeto Carretera a un array de bytes
             byte[] datos = C.CarreteraABytes();
+
+            // Envío primero los 4 bytes que indican la longitud del mensaje
+            byte[] longitud = BitConverter.GetBytes(datos.Length);
+            NS.Write(longitud, 0, longitud.Length);
+
+            // Luego envío el contenido real de la carretera
             NS.Write(datos, 0, datos.Length);
         }
 
         // Método para leer de un NetworkStream los datos de un objeto Carretera
         public static Carretera LeerDatosCarreteraNS(NetworkStream NS)
         {
-            byte[] buffer = new byte[4096];
-            int totalBytes = 0;
-            MemoryStream tmpStream = new MemoryStream();
+            // Primero leo los 4 bytes iniciales que me indican la longitud del mensaje
+            byte[] longitudBuffer = new byte[4];
+            int leidosLongitud = NS.Read(longitudBuffer, 0, 4);
+            int longitudDatos = BitConverter.ToInt32(longitudBuffer, 0);
 
-            do
+            // Ahora sé cuántos bytes exactamente tengo que leer
+            byte[] buffer = new byte[longitudDatos];
+            int totalLeidos = 0;
+
+            while (totalLeidos < longitudDatos)
             {
-                int bytesLeidos = NS.Read(buffer, 0, buffer.Length);
-                tmpStream.Write(buffer, 0, bytesLeidos);
-                totalBytes += bytesLeidos;
+                int leidos = NS.Read(buffer, totalLeidos, longitudDatos - totalLeidos);
+                totalLeidos += leidos;
             }
-            while (NS.DataAvailable);
 
-            byte[] datosRecibidos = tmpStream.ToArray();
-            return Carretera.BytesACarretera(datosRecibidos);
+            // Devuelvo el objeto deserializado
+            return Carretera.BytesACarretera(buffer);
         }
 
         // Método para enviar datos de tipo Vehiculo en un NetworkStream
