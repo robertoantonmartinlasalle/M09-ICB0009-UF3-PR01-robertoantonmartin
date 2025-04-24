@@ -72,6 +72,9 @@ namespace Client
                     // Recibo el objeto Carretera completo actualizado
                     Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
 
+                    // Etapa 3 (mejora visual): ordeno la lista por posición para una lectura más clara
+                    carreteraRecibida.VehiculosEnCarretera.Sort((a, b) => a.Pos.CompareTo(b.Pos));
+
                     // Muestro el estado actual de la carretera
                     Console.Write("Vehículos en carretera (posición): ");
                     carreteraRecibida.MostrarBicicletas();
