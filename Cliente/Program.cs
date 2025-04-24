@@ -4,9 +4,9 @@ using System.Net;
 using System.Text;
 using System.IO;
 using System.Threading;
-using NetworkStreamNS;       
-using CarreteraClass;        
-using VehiculoClass;         
+using NetworkStreamNS;
+using CarreteraClass;
+using VehiculoClass;
 
 namespace Client
 {
@@ -38,7 +38,7 @@ namespace Client
                 NetworkStreamClass.EscribirMensajeNetworkStream(stream, id.ToString());
                 Console.WriteLine("ID confirmado al servidor.");
 
-                // Asigno dirección aleatoria al vehículo 
+                // Asigno dirección aleatoria al vehículo
                 string direccion = new Random().Next(2) == 0 ? "Norte" : "Sur";
 
                 // Creo el objeto Vehiculo con los datos reales.
@@ -48,6 +48,9 @@ namespace Client
 
                 // Fuerzo la posición inicial a 0 para evitar avanzar de golpe
                 v.Pos = 0;
+
+                // Muestro por pantalla la velocidad generada para tener contexto
+                Console.WriteLine($"→ Velocidad del vehículo: {v.Velocidad} ms entre cada paso.");
 
                 // Etapa 3 Ejercicio 2: simulo el avance del vehículo en bucle
                 while (!v.Acabado)
@@ -68,17 +71,16 @@ namespace Client
 
                     // Recibo el objeto Carretera completo actualizado
                     Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
-                    // Console.WriteLine("✓ Carretera recibida correctamente del servidor.");
 
                     // Muestro el estado actual de la carretera
                     Console.Write("Vehículos en carretera (posición): ");
                     carreteraRecibida.MostrarBicicletas();
 
-                    // Espero 1 segundo para simular el tiempo de avance
-                    Thread.Sleep(1000);
+                    // Etapa 3 (corregida): espero un tiempo proporcional a la velocidad
+                    Thread.Sleep(v.Velocidad);  // ← Tiempo entre pasos según la velocidad
                 }
 
-                Console.WriteLine(" Vehículo ha llegado a destino. Fin de la simulación.");
+                Console.WriteLine("✓ Vehículo ha llegado a destino. Fin de la simulación.");
             }
             catch (Exception e)
             {
