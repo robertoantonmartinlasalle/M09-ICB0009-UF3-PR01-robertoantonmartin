@@ -11,25 +11,24 @@ public class Carretera
 
     public Carretera ()
     {
-
     }
 
-    //Crea un nuevo vehiculo
+    // Crea un nuevo vehiculo
     public void CrearVehiculo ()
     {
         Vehiculo V = new Vehiculo();
         VehiculosEnCarretera.Add(V);
     }
 
-    //Añade un vehiculo ya creado a la lista de vehiculos en carretera
+    // Añade un vehiculo ya creado a la lista de vehiculos en carretera
     public void AñadirVehiculo (Vehiculo V)
     {
         VehiculosEnCarretera.Add(V);
         NumVehiculosEnCarrera++;
     }
 
-    //Actualiza los datos de un vehiculo ya existente en la lista de vehiculos en carretera. 
-     public void ActualizarVehiculo(Vehiculo V)
+    // Actualiza los datos de un vehiculo ya existente en la lista de vehiculos en carretera. 
+    public void ActualizarVehiculo(Vehiculo V)
     {
         Vehiculo veh = VehiculosEnCarretera.FirstOrDefault(x => x.Id == V.Id);
 
@@ -39,6 +38,9 @@ public class Carretera
             veh.Velocidad = V.Velocidad;
             veh.Acabado = V.Acabado;
             veh.Parado = V.Parado;
+
+            // ✅ Se añade la actualización de la dirección para mantener la lógica Norte-Sur
+            veh.Direccion = V.Direccion;
         }
         else
         {
@@ -47,41 +49,35 @@ public class Carretera
         }
     }
 
-    //Muestra por pantalla los vehiculos en carretera. 
-    public void MostrarBicicletas ()
+    // Muestra por pantalla los vehículos en carretera con dirección y posición
+    public void MostrarBicicletas()
     {
-        string strVehs = "";
-        foreach (Vehiculo v in VehiculosEnCarretera)
+        if (VehiculosEnCarretera.Count == 0)
         {
-            strVehs = strVehs + "\t" + v.Pos;
+            Console.WriteLine("(No hay vehículos en carretera)");
+            return;
         }
 
-        Console.WriteLine(strVehs);
+        foreach (Vehiculo v in VehiculosEnCarretera)
+        {
+            Console.WriteLine($"  → ID: {v.Id} | Dirección: {v.Direccion} | Posición: {v.Pos} km");
+        }
     }
 
-    //Permite serializar Carretera a array de bytes mediant formato XML
+    // Permite serializar Carretera a array de bytes mediante formato XML
     public byte[] CarreteraABytes()
     {
         XmlSerializer serializer = new XmlSerializer(typeof(Carretera));
-            
         MemoryStream MS = new MemoryStream();
-  
         serializer.Serialize(MS, this);
-       
         return MS.ToArray();
     }
 
-    //Permite desserializar una cadena de bytes a un objeto de tipo Carretera
+    // Permite deserializar una cadena de bytes a un objeto de tipo Carretera
     public static Carretera BytesACarretera(byte[] bytesCarrera)
     {
-        Carretera tmpCarretera; 
-        
         XmlSerializer serializer = new XmlSerializer(typeof(Carretera));
-
         MemoryStream MS = new MemoryStream(bytesCarrera);
-
-        tmpCarretera = (Carretera) serializer.Deserialize(MS);
-
-        return tmpCarretera;
-    }    
+        return (Carretera)serializer.Deserialize(MS);
+    }
 }

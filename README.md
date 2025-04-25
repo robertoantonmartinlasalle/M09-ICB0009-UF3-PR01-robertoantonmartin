@@ -477,6 +477,8 @@ Ahora cada vehículo avanza de forma independiente no solo en posición, sino ta
 
 ---
 
+
+
 ## Etapa 4 – Envío del estado global de la carretera a todos los clientes conectados
 
 ### Objetivo
@@ -574,6 +576,35 @@ Además, el código se ha vuelto más modular y robusto. Me ha servido para prac
 
 
 ---
+###  **Ampliación: Lógica de avance según dirección "Norte" o "Sur"** (Pertenece etapa 3)
+
+En esta fase he incorporado una funcionalidad crucial para que la simulación sea **realista y bidireccional**: la gestión del avance de los vehículos en función de su dirección (`Norte` o `Sur`).
+
+####  ¿Qué se ha añadido?
+- Ahora, cada vehículo **se inicializa con una dirección aleatoria** ("Norte" o "Sur").
+- Si un vehículo va al **Norte**, comienza en el **km 0** y avanza hacia el **km 100**.
+- Si va al **Sur**, comienza en el **km 100** y retrocede hasta el **km 0**.
+- El bucle de avance se ha adaptado para que cada cliente siga la lógica correcta según su dirección.
+
+####  ¿Cómo se refleja en consola?
+- Se visualiza en todo momento:
+  - El `ID`, la `Dirección` y la `Posición` actual de cada vehículo.
+  - La sincronización con el resto de clientes conectados.
+- Se observa cómo **los vehículos pueden cruzarse** en posiciones intermedias (por ejemplo, ambos pasan por el km 40 o 60), lo cual es completamente coherente si no se ha implementado colisión o control de paso en puentes.
+
+---
+
+###  Nueva Captura de pantalla
+
+![ Ampliación Etapa 3 - Vehículos cruzando con lógica Norte-Sur](./img/etapa3ej2-vehiculos-norte-sur.png)
+
+---
+
+###  Comentario final tras implementación de dirección
+
+Ahora los vehículos **no solo se mueven de forma concurrente y a ritmos distintos**, sino que **cada uno tiene su origen y destino según su dirección**, lo cual es lo que cabría esperar en un sistema de simulación vial distribuido.
+
+Además, esta modificación me ha permitido entender cómo se puede adaptar un sistema cliente-servidor para representar flujos de datos diferenciados, en este caso reflejados en el sentido de circulación de cada vehículo. El hecho de que dos vehículos lleguen a cruzarse en consola demuestra que **ambos están bien sincronizados y avanzan según su propia lógica de dirección**.
 
 
 

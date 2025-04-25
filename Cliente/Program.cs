@@ -46,23 +46,34 @@ namespace Client
                 v.Id = id;
                 v.Direccion = direccion;
 
-                // Fuerzo la posición inicial a 0 para evitar avanzar de golpe
-                v.Pos = 0;
+                // Establezco la posición inicial en función de la dirección
+                v.Pos = v.Direccion == "Norte" ? 0 : 100;
 
-                // Muestro por pantalla la velocidad generada para tener contexto
+                // Muestro por pantalla la velocidad generada y dirección para tener contexto
+                Console.WriteLine($"→ Dirección asignada: {v.Direccion}");
                 Console.WriteLine($"→ Velocidad del vehículo: {v.Velocidad} ms entre cada paso.");
 
                 // Etapa 3 y 5: simulo el avance del vehículo en bucle y recibo carretera
                 while (!v.Acabado)
                 {
-                    // Avanzo el vehículo manualmente de 10 en 10 km
-                    v.Pos += 10;
-
-                    // Si llega a los 100 km, marco como acabado
-                    if (v.Pos >= 100)
+                    // Avanzo el vehículo manualmente de 10 en 10 km según su dirección
+                    if (v.Direccion == "Norte")
                     {
-                        v.Pos = 100;
-                        v.Acabado = true;
+                        v.Pos += 10;
+                        if (v.Pos >= 100)
+                        {
+                            v.Pos = 100;
+                            v.Acabado = true;
+                        }
+                    }
+                    else // Dirección Sur
+                    {
+                        v.Pos -= 10;
+                        if (v.Pos <= 0)
+                        {
+                            v.Pos = 0;
+                            v.Acabado = true;
+                        }
                     }
 
                     // Envío el estado actualizado del vehículo al servidor
@@ -76,14 +87,17 @@ namespace Client
                     carreteraRecibida.VehiculosEnCarretera.Sort((a, b) => a.Pos.CompareTo(b.Pos));
 
                     // Muestro el estado actual de la carretera
-                    Console.WriteLine("[Actualización desde servidor] Vehículos en carretera (posición):");
-                    carreteraRecibida.MostrarBicicletas();
+                    Console.WriteLine("[Actualización desde servidor] Vehículos en carretera:");
+                    foreach (Vehiculo veh in carreteraRecibida.VehiculosEnCarretera)
+                    {
+                        Console.WriteLine($"  → ID: {veh.Id} | Dirección: {veh.Direccion} | Posición: {veh.Pos} km");
+                    }
 
                     // Espero un tiempo proporcional a la velocidad
                     Thread.Sleep(v.Velocidad); // ← Tiempo entre pasos según velocidad
                 }
 
-                Console.WriteLine(" Vehículo ha llegado a destino. Fin de la simulación.");
+                Console.WriteLine("✓ Vehículo ha llegado a destino. Fin de la simulación.");
             }
             catch (Exception e)
             {
