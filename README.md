@@ -671,6 +671,42 @@ Gracias a esta última fase, el sistema ahora simula de manera precisa cómo var
 
 ---
 
+# Preguntas Teóricas
+
+## Pregunta teórica 1
+
+**Explica las ventajas e inconvenientes de programar el control de paso por el túnel, en el cliente o en el servidor.**
+
+**Respuesta:**
+
+**Control de paso en el servidor:**
+
+- **Ventajas:**
+  - Mayor control centralizado.
+  - Evita conflictos de acceso concurrente (todos los clientes consultan al servidor).
+  - Facilita la consistencia del estado del puente.
+  - Los clientes no necesitan lógica compleja, solo obedecer.
+
+- **Inconvenientes:**
+  - El servidor puede convertirse en un cuello de botella si hay muchos clientes.
+  - Mayor carga de procesamiento en el servidor.
+
+**Control de paso en el cliente:**
+
+- **Ventajas:**
+  - Menor carga en el servidor (los clientes deciden entre ellos).
+  - Puede mejorar la escalabilidad en sistemas pequeños.
+
+- **Inconvenientes:**
+  - Alta posibilidad de inconsistencias (dos clientes pueden pensar que el puente está libre al mismo tiempo).
+  - Complejidad mayor en la programación de los clientes.
+  - Difícil coordinar acceso concurrente seguro entre múltiples clientes.
+
+**Conclusión:**  
+En sistemas distribuidos reales donde la consistencia es crítica (como en esta práctica), **es mucho más seguro y correcto implementar el control en el servidor**, como he hecho en el ejercicio.
+
+---
+
 
 ##  Alumno
 
