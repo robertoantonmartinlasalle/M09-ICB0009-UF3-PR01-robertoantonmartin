@@ -27,6 +27,10 @@ El proyecto se organiza en varios subproyectos dentro de un workspace en Visual 
 
 ---
 
+## EJERCICIO 1 - Conexión de clientes
+
+---
+
 ##  Etapa 1 - Conexión servidor-cliente
 
 ###  Objetivo
@@ -605,6 +609,8 @@ En esta fase he incorporado una funcionalidad crucial para que la simulación se
 Ahora los vehículos **no solo se mueven de forma concurrente y a ritmos distintos**, sino que **cada uno tiene su origen y destino según su dirección**, lo cual es lo que cabría esperar en un sistema de simulación vial distribuido.
 
 Además, esta modificación me ha permitido entender cómo se puede adaptar un sistema cliente-servidor para representar flujos de datos diferenciados, en este caso reflejados en el sentido de circulación de cada vehículo. El hecho de que dos vehículos lleguen a cruzarse en consola demuestra que **ambos están bien sincronizados y avanzan según su propia lógica de dirección**.
+
+---
 
 # Ejercicio 3 – Control de tráfico en el puente
 
