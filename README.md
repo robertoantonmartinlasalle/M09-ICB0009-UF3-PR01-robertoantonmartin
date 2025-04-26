@@ -707,6 +707,44 @@ En sistemas distribuidos reales donde la consistencia es crítica (como en esta 
 
 ---
 
+## Pregunta teórica 2
+
+**Explica cómo gestionarías las colas de espera en el servidor. ¿Qué estructura de datos usarías para priorizar vehículos según su dirección? Justifica tu respuesta.**
+
+**Respuesta:**
+
+Para gestionar correctamente las colas de espera en el servidor, usaría una **estructura de tipo `Queue` (cola FIFO)** para cada dirección (`Norte` y `Sur`).
+
+- Se utilizaría **una cola específica por dirección**:
+  - Una `Queue<Vehiculo>` para los vehículos que van al **Norte**.
+  - Otra `Queue<Vehiculo>` para los vehículos que van al **Sur**.
+
+**Ventajas de este enfoque:**
+
+- **Orden de llegada garantizado:** la estructura `Queue` asegura que los vehículos cruzan en el mismo orden en que llegaron a esperar.
+- **Separación clara de flujos:** permite gestionar independientemente a los vehículos de cada dirección.
+- **Evita colisiones:** el servidor puede comprobar si hay vehículos esperando en una dirección antes de permitir que entren vehículos de la dirección opuesta.
+- **Facilidad de implementación:** con operaciones simples como `Enqueue()` para añadir y `Dequeue()` para retirar vehículos que van a cruzar.
+
+**Funcionamiento general:**
+
+- Cuando un vehículo llega al puente y no puede cruzar, se **añade a su cola correspondiente**.
+- Cuando el puente se libera:
+  - Se **da prioridad** a los vehículos que ya estaban esperando en la cola de su dirección.
+  - Si no hay vehículos esperando en una dirección, se puede permitir el paso a la otra dirección.
+
+**Estado mostrado en los clientes:**
+
+- Los clientes muestran su estado según su situación:
+  - `"Esperando (Norte)"`, `"Esperando (Sur)"` si están en cola.
+  - `"Cruzando puente"` cuando reciben permiso del servidor.
+
+**Conclusión:**  
+Usar **dos colas (una por dirección)** permite mantener la lógica ordenada, priorizar correctamente los vehículos y reflejar fielmente el comportamiento esperado en una simulación de tráfico realista y segura.
+
+
+---
+
 
 ##  Alumno
 
