@@ -35,10 +35,14 @@ namespace Servidor
         // Etapa 3 - Ejercicio 2: Creo una carretera global para simular varios vehículos en movimiento.
         static Carretera carreteraGlobal = new Carretera();
 
+        // Etapa 3 - Ejercicio 3: Variable que guarda qué vehículo está cruzando el puente
+        static Vehiculo vehiculoEnPuente = null;
+
         // Objetos de bloqueo para concurrencia segura
         static readonly object lockId = new object();
         static readonly object lockLista = new object();
         static readonly object lockCarretera = new object();
+        static readonly object lockPuente = new object(); // Bloqueo exclusivo para el control del puente
 
         static void Main(string[] args)
         {
@@ -161,6 +165,39 @@ namespace Servidor
                     // Recibo el vehículo actualizado desde el cliente
                     Vehiculo vehiculoRecibido = NetworkStreamClass.LeerDatosVehiculoNS(stream);
 
+                    // 🔥 Etapa 3 - Ejercicio 3: Control de paso por el puente
+                    lock (lockPuente)
+                    {
+                        // Verifico si el vehículo está llegando a la entrada del puente
+                        if ((vehiculoRecibido.Direccion == "Norte" && vehiculoRecibido.Pos == 50) ||
+                            (vehiculoRecibido.Direccion == "Sur" && vehiculoRecibido.Pos == 50))
+                        {
+                            if (vehiculoEnPuente == null)
+                            {
+                                // El puente está libre → asigno este vehículo
+                                vehiculoEnPuente = vehiculoRecibido;
+                                Console.WriteLine($"[Servidor] Vehículo {vehiculoRecibido.Id} está cruzando el puente.");
+                            }
+                            else if (vehiculoEnPuente.Id != vehiculoRecibido.Id)
+                            {
+                                // Otro vehículo está en el puente → este debe esperar
+                                Console.WriteLine($"[Servidor] Vehículo {vehiculoRecibido.Id} esperando: puente ocupado por {vehiculoEnPuente.Id}.");
+                                continue; // NO actualizamos posición ni mandamos carretera todavía
+                            }
+                        }
+
+                        // Verifico si el vehículo sale del puente
+                        if ((vehiculoRecibido.Direccion == "Norte" && vehiculoRecibido.Pos == 60) ||
+                            (vehiculoRecibido.Direccion == "Sur" && vehiculoRecibido.Pos == 40))
+                        {
+                            if (vehiculoEnPuente != null && vehiculoEnPuente.Id == vehiculoRecibido.Id)
+                            {
+                                vehiculoEnPuente = null; //  Libero el puente
+                                Console.WriteLine($"[Servidor] Vehículo {vehiculoRecibido.Id} ha salido del puente.");
+                            }
+                        }
+                    }
+
                     // Etapa 3: Actualizo la carretera global con el nuevo estado del vehículo
                     lock (lockCarretera)
                     {
@@ -170,7 +207,8 @@ namespace Servidor
                     // Etapa 4: Envío el estado de la carretera a todos los clientes conectados
                     EnviarCarreteraATodos(carreteraGlobal);
 
-                    if (vehiculoRecibido.Pos >= 100)
+                    if ((vehiculoRecibido.Direccion == "Norte" && vehiculoRecibido.Pos >= 100) ||
+                        (vehiculoRecibido.Direccion == "Sur" && vehiculoRecibido.Pos <= 0))
                     {
                         Console.WriteLine($"[Hilo {Thread.CurrentThread.ManagedThreadId}] El vehículo {vehiculoRecibido.Id} ha llegado a destino.");
                         break;

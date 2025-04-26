@@ -606,6 +606,64 @@ Ahora los vehículos **no solo se mueven de forma concurrente y a ritmos distint
 
 Además, esta modificación me ha permitido entender cómo se puede adaptar un sistema cliente-servidor para representar flujos de datos diferenciados, en este caso reflejados en el sentido de circulación de cada vehículo. El hecho de que dos vehículos lleguen a cruzarse en consola demuestra que **ambos están bien sincronizados y avanzan según su propia lógica de dirección**.
 
+# Ejercicio 3 – Control de tráfico en el puente
+
+En esta fase del proyecto, el objetivo ha sido implementar un sistema de control que permita que solo un vehículo cruce el **puente de un único carril** a la vez. Además, se debe impedir que vehículos en dirección opuesta intenten cruzar mientras el puente esté ocupado.
+
+---
+
+## Objetivo
+
+- Permitir que un solo vehículo esté cruzando el puente en cualquier momento.
+- Bloquear el acceso al puente a los vehículos mientras otro vehículo esté cruzando.
+- Asegurar que los vehículos esperan correctamente su turno para cruzar.
+- Mantener la actualización en tiempo real de la carretera para todos los clientes.
+
+---
+
+## Explicación técnica
+
+- Se ha añadido en el **servidor** una variable global `vehiculoEnPuente`, protegida con `lock`.
+- Cuando un vehículo alcanza una posición crítica (60 km en Norte, o 40 km en Sur), envía una solicitud para entrar al puente.
+- El servidor responde:
+  - Si no hay ningún vehículo en el puente (`vehiculoEnPuente == null`), autoriza el acceso.
+  - Si el puente está ocupado (`vehiculoEnPuente != null`), obliga al cliente a **esperar** hasta que quede libre.
+- Cuando un vehículo termina de cruzar, el servidor libera el puente (`vehiculoEnPuente = null`) y notifica a los vehículos esperando que pueden reintentar cruzar.
+- Esta lógica se ha implementado **en el servidor**, centralizando el control de acceso al puente para evitar inconsistencias.
+
+---
+
+## Resultado de la prueba
+
+- **Cliente 1** y **Cliente 2** inician su recorrido en paralelo.
+- Cuando el **Cliente 1** llega al puente, solicita acceso y se le permite cruzar.
+- Mientras el **Cliente 1** cruza, el **Cliente 2** llega al puente y detecta que el puente está ocupado, entrando en estado de **espera**.
+- Una vez que el **Cliente 1** ha terminado de cruzar, el **Cliente 2** recibe la notificación y puede iniciar su cruce.
+- El avance y cruce de ambos vehículos se observa correctamente en la consola de ambos clientes y del servidor.
+
+---
+
+## Capturas de pantalla
+
+![Ejercicio 3 - Control de tráfico en el puente - Parte 1](./img/ejercicio3-puente-1.png)
+
+![Ejercicio 3 - Control de tráfico en el puente - Parte 2](./img/ejercicio3-puente-2.png)
+
+---
+
+## Comentario personal
+
+Este ejercicio ha sido **clave** para culminar la simulación de tráfico de forma **realista** y **coherente**.
+
+La implementación del control de acceso al puente me ha permitido comprender cómo gestionar **recursos compartidos críticos** en un sistema distribuido, utilizando mecanismos de sincronización (`lock`) y control de estados en el servidor.
+
+También he observado en la práctica la importancia de diseñar bien la lógica de espera y notificación para evitar bloqueos o accesos simultáneos no deseados.
+
+Gracias a esta última fase, el sistema ahora simula de manera precisa cómo varios vehículos interactúan de forma **concurrente, sincronizada y controlada** en un entorno compartido.
+
+
+
+---
 
 
 ##  Alumno

@@ -53,7 +53,7 @@ namespace Client
                 Console.WriteLine($"→ Dirección asignada: {v.Direccion}");
                 Console.WriteLine($"→ Velocidad del vehículo: {v.Velocidad} ms entre cada paso.");
 
-                // Etapa 3 y 5: simulo el avance del vehículo en bucle y recibo carretera
+                // Etapa 3, 5 y 6: simulo el avance del vehículo en bucle y recibo carretera
                 while (!v.Acabado)
                 {
                     // Avanzo el vehículo manualmente de 10 en 10 km según su dirección
@@ -76,25 +76,61 @@ namespace Client
                         }
                     }
 
-                    // Envío el estado actualizado del vehículo al servidor
-                    NetworkStreamClass.EscribirDatosVehiculoNS(stream, v);
-                    Console.WriteLine($"\n→ Vehículo enviado al servidor - Posición: {v.Pos} km");
-
-                    // Recibo el objeto Carretera completo actualizado desde el servidor
-                    Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
-
-                    // Ordeno la lista por posición para mayor claridad visual
-                    carreteraRecibida.VehiculosEnCarretera.Sort((a, b) => a.Pos.CompareTo(b.Pos));
-
-                    // Muestro el estado actual de la carretera
-                    Console.WriteLine("[Actualización desde servidor] Vehículos en carretera:");
-                    foreach (Vehiculo veh in carreteraRecibida.VehiculosEnCarretera)
+                    // Antes de avanzar, controlo si estamos cerca del puente
+                    if ((v.Direccion == "Norte" && v.Pos == 50) || (v.Direccion == "Sur" && v.Pos == 50))
                     {
-                        Console.WriteLine($"  → ID: {veh.Id} | Dirección: {veh.Direccion} | Posición: {veh.Pos} km");
-                    }
+                        Console.WriteLine($"→ Intentando entrar al puente...");
 
-                    // Espero un tiempo proporcional a la velocidad
-                    Thread.Sleep(v.Velocidad); // ← Tiempo entre pasos según velocidad
+                        bool puedeCruzar = false;
+
+                        // Hasta que pueda pasar, me mantengo preguntando
+                        while (!puedeCruzar)
+                        {
+                            // Envío mi estado actual al servidor
+                            NetworkStreamClass.EscribirDatosVehiculoNS(stream, v);
+
+                            // Recibo la carretera para verificar
+                            Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
+
+                            // Busco si soy el que está autorizado a cruzar
+                            Vehiculo yo = carreteraRecibida.VehiculosEnCarretera.Find(veh => veh.Id == v.Id);
+
+                            if (yo != null && (yo.Pos == 50 || yo.Pos == 51))
+                            {
+                                // Me dejan cruzar
+                                puedeCruzar = true;
+                                Console.WriteLine("→ Acceso permitido: cruzando el puente.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("→ Puente ocupado. Esperando turno...");
+                                Thread.Sleep(500); // Espero medio segundo antes de volver a intentar
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Envío el estado actualizado del vehículo al servidor
+                        NetworkStreamClass.EscribirDatosVehiculoNS(stream, v);
+
+                        Console.WriteLine($"\n→ Vehículo enviado al servidor - Posición: {v.Pos} km");
+
+                        // Recibo el objeto Carretera completo actualizado desde el servidor
+                        Carretera carreteraRecibida = NetworkStreamClass.LeerDatosCarreteraNS(stream);
+
+                        // Ordeno la lista por posición para mayor claridad visual
+                        carreteraRecibida.VehiculosEnCarretera.Sort((a, b) => a.Pos.CompareTo(b.Pos));
+
+                        // Muestro el estado actual de la carretera
+                        Console.WriteLine("[Actualización desde servidor] Vehículos en carretera:");
+                        foreach (Vehiculo veh in carreteraRecibida.VehiculosEnCarretera)
+                        {
+                            Console.WriteLine($"  → ID: {veh.Id} | Dirección: {veh.Direccion} | Posición: {veh.Pos} km");
+                        }
+
+                        // Espero un tiempo proporcional a la velocidad
+                        Thread.Sleep(v.Velocidad); // ← Tiempo entre pasos según velocidad
+                    }
                 }
 
                 Console.WriteLine("✓ Vehículo ha llegado a destino. Fin de la simulación.");
