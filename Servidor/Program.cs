@@ -36,7 +36,7 @@ namespace Servidor
         static Carretera carreteraGlobal = new Carretera();
 
         // Etapa 3 - Ejercicio 3: Variable que guarda qué vehículo está cruzando el puente
-        static Vehiculo vehiculoEnPuente = null;
+        static Vehiculo? vehiculoEnPuente = null;
 
         // Objetos de bloqueo para concurrencia segura
         static readonly object lockId = new object();
